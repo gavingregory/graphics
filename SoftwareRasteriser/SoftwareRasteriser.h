@@ -59,7 +59,9 @@ protected:
 	Colour*	GetCurrentBuffer();
 
 	void	RasterisePointsMesh(RenderObject*o);
-	void	RasteriseLinesMesh(RenderObject*o);
+  void	RasteriseLinesMesh(RenderObject*o); 
+  void  RasteriseLineLoopMesh(RenderObject*o);
+  void  RasteriseLineStripMesh(RenderObject*o);
 	void	RasteriseTriMesh(RenderObject*o);
 
 	virtual void Resize();

@@ -122,6 +122,12 @@ void	SoftwareRasteriser::DrawObject(RenderObject*o) {
   case PRIMITIVE_LINES:
     RasteriseLinesMesh(o);
     break;
+  case PRIMITIVE_LINELOOP:
+    RasteriseLineLoopMesh(o);
+    break;
+  case PRIMITIVE_LINESTRIP:
+    RasteriseLineStripMesh(o);
+    break;
   }
 }
 
@@ -214,6 +220,38 @@ void	SoftwareRasteriser::RasteriseLinesMesh(RenderObject*o) {
     v1.SelfDivisionByW();
 
     RasteriseLine(v0, v1);
+  }
+}
+
+void SoftwareRasteriser::RasteriseLineLoopMesh(RenderObject*o) {
+  if (o->GetMesh()->numVertices > 2) {
+    Matrix4 mvp = viewProjMatrix * o->GetModelMatrix();
+    Vector4 v0;
+    Vector4 v1;
+  
+    for (uint i = 0; i < o->GetMesh()->numVertices; ++i) {
+      v0 = mvp * o->GetMesh()->vertices[i];
+      v1 = mvp* o->GetMesh()->vertices[(i+1) % o->GetMesh()->numVertices];
+      v0.SelfDivisionByW();
+      v1.SelfDivisionByW();
+      RasteriseLine(v0, v1);
+    }
+  }
+}
+
+void SoftwareRasteriser::RasteriseLineStripMesh(RenderObject*o) {
+  if (o->GetMesh()->numVertices > 2) {
+    Matrix4 mvp = viewProjMatrix * o->GetModelMatrix();
+    Vector4 v0;
+    Vector4 v1;
+
+    for (uint i = 0; i < o->GetMesh()->numVertices-1; ++i) {
+      v0 = mvp * o->GetMesh()->vertices[i];
+      v1 = mvp* o->GetMesh()->vertices[i + 1];
+      v0.SelfDivisionByW();
+      v1.SelfDivisionByW();
+      RasteriseLine(v0, v1);
+    }
   }
 }
 

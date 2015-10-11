@@ -30,6 +30,8 @@ using std::string;
 enum PrimitiveType {
 	PRIMITIVE_POINTS,
 	PRIMITIVE_LINES,
+  PRIMITIVE_LINESTRIP,
+  PRIMITIVE_LINELOOP,
 	PRIMITIVE_TRIANGLES
 };
 
@@ -40,7 +42,9 @@ public:
 	~Mesh(void);
 
 	static Mesh*	GenerateTriangle();
-	static Mesh*	GenerateLine(const Vector3 &from, const Vector3 &to);
+	static Mesh*	GenerateLines(const std::vector<Vector3> points);
+  static Mesh*	GenerateLineLoop(const std::vector<Vector3> points);
+  static Mesh*	GenerateLineStrip(const std::vector<Vector3> points);
   static Mesh*  GeneratePoints(const std::vector<Vector3> points);
 
 	PrimitiveType	GetType() { return type;}
