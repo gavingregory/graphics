@@ -64,54 +64,54 @@ SoftwareRasteriser::~SoftwareRasteriser(void)	{
 		delete[] buffers[i];
 	}
 #endif
-	delete[] depthBuffer;
+delete[] depthBuffer;
 }
 
 void SoftwareRasteriser::Resize() {
-	Window::Resize(); //make sure our base class gets to do anything it needs to
+  Window::Resize(); //make sure our base class gets to do anything it needs to
 
 #ifndef USE_OS_BUFFERS
-	for (int i = 0; i < 2; ++i) {
-		delete[] buffers[i];
-		buffers[i] = new Colour[screenWidth * screenHeight];
-	}
+  for (int i = 0; i < 2; ++i) {
+    delete[] buffers[i];
+    buffers[i] = new Colour[screenWidth * screenHeight];
+  }
 #else
-	for (int i = 0; i < 2; ++i) {
-		buffers[i] = (Colour*)bufferData[i];
-	}
+  for (int i = 0; i < 2; ++i) {
+    buffers[i] = (Colour*)bufferData[i];
+  }
 #endif
 
-	delete[] depthBuffer;
-	depthBuffer = new unsigned short[screenWidth * screenHeight];
+  delete[] depthBuffer;
+  depthBuffer = new unsigned short[screenWidth * screenHeight];
 
-	float zScale = (pow(2.0f, 16) - 1) * 0.5f;
+  float zScale = (pow(2.0f, 16) - 1) * 0.5f;
 
-	Vector3 halfScreen = Vector3((screenWidth - 1) * 0.5f, (screenHeight - 1) * 0.5f, zScale);
+  Vector3 halfScreen = Vector3((screenWidth - 1) * 0.5f, (screenHeight - 1) * 0.5f, zScale);
 
-	portMatrix = Matrix4::Translation(halfScreen) * Matrix4::Scale(halfScreen);
+  portMatrix = Matrix4::Translation(halfScreen) * Matrix4::Scale(halfScreen);
 }
 
 Colour*	SoftwareRasteriser::GetCurrentBuffer() {
-	return buffers[currentDrawBuffer];
+  return buffers[currentDrawBuffer];
 }
 
 void	SoftwareRasteriser::ClearBuffers() {
-	Colour* buffer = GetCurrentBuffer();
+  Colour* buffer = GetCurrentBuffer();
 
-	unsigned int clearVal = 0xFF000000;
-	unsigned int depthVal = ~0;
+  unsigned int clearVal = 0xFF000000;
+  unsigned int depthVal = ~0;
 
-	for(uint y = 0; y < screenHeight; ++y) {
-		for(uint x = 0; x < screenWidth; ++x) {
-			buffer[(y * screenWidth) + x].c  = clearVal;
-			depthBuffer[(y * screenWidth) + x] = depthVal;
-		}
-	}
+  for (uint y = 0; y < screenHeight; ++y) {
+    for (uint x = 0; x < screenWidth; ++x) {
+      buffer[(y * screenWidth) + x].c = clearVal;
+      depthBuffer[(y * screenWidth) + x] = depthVal;
+    }
+  }
 }
 
 void	SoftwareRasteriser::SwapBuffers() {
-	PresentBuffer(buffers[currentDrawBuffer]);
-	currentDrawBuffer = !currentDrawBuffer;
+  PresentBuffer(buffers[currentDrawBuffer]);
+  currentDrawBuffer = !currentDrawBuffer;
 }
 
 float SoftwareRasteriser::ScreenAreaOfTri(const Vector4& a, const Vector4& b, const Vector4& c) {
@@ -145,6 +145,49 @@ void SoftwareRasteriser::ShadePixel(uint x, uint y, const Colour& c) {
     return;
   int index = (y*screenWidth) + x;
   buffers[currentDrawBuffer][index] = c;
+}
+
+
+void	SoftwareRasteriser::RasteriseTri(const Vector4 &triA, const Vector4 &triB, const Vector4 &triC,
+  const Colour &colA, const Colour &colB, const Colour &colC,
+  const Vector3 &texA, const Vector3 &texB, const Vector3 &texC) {
+  // incoming triangles are in NDC space
+  Vector4 v0 = portMatrix * triA; // now in viewport space
+  Vector4 v1 = portMatrix * triB; // now in viewport space
+  Vector4 v2 = portMatrix * triC; // now in viewport space
+
+  BoundingBox b = CalculateBoxForTri(v0, v1, v2);
+
+  float subTriArea[3];
+
+  Vector4 screenPos(0, 0, 0, 1);
+
+  for (float y = b.topLeft.y; y < b.bottomRight.y; ++y) {
+    for (float x = b.topLeft.x; x < b.bottomRight.x; ++x) {
+      screenPos.x = x; // create vertex 'p';
+      screenPos.y = y; // create vertex 'p';
+      
+      // todo: check this is correct???
+      float triArea = ScreenAreaOfTri(v0, v1, v2);
+
+      subTriArea[0] = abs(ScreenAreaOfTri(v0, screenPos, v1));
+      subTriArea[1] = abs(ScreenAreaOfTri(v1, screenPos, v2));
+      subTriArea[2] = abs(ScreenAreaOfTri(v2, screenPos, v0));
+
+      float triSum = subTriArea[0] + subTriArea[1] + subTriArea[2];
+
+      if (triSum > (triArea + 0.01f)) {
+        continue; // current pixel is NOT in this triangle
+      }
+      if (triSum < 1.0f) {
+        continue; // tiny triangle we don't care about
+      }
+
+      ShadePixel((int)x, (int)y, Colour::White);
+
+    }
+  }
+
 }
 
 BoundingBox SoftwareRasteriser::CalculateBoxForTri(const Vector4& a, const Vector4& b, const Vector4& c) {
@@ -291,5 +334,15 @@ void SoftwareRasteriser::RasteriseLineStripMesh(RenderObject*o) {
 }
 
 void	SoftwareRasteriser::RasteriseTriMesh(RenderObject*o) {
+  Matrix4 mvp = viewProjMatrix * o->GetModelMatrix();
 
+  for (uint i = 0; i < o->GetMesh()->numVertices; i += 3) {
+    Vector4 v0 = mvp * o->GetMesh()->vertices[i];
+    Vector4 v1 = mvp * o->GetMesh()->vertices[i+1];
+    Vector4 v2 = mvp * o->GetMesh()->vertices[i+2];
+    v0.SelfDivisionByW();
+    v1.SelfDivisionByW();
+    v2.SelfDivisionByW();
+    RasteriseTri(v0, v1, v2);
+  }
 }

@@ -10,7 +10,8 @@ int main() {
 	SoftwareRasteriser r(800,600);
   RenderObject* pointsObject = new RenderObject();
   RenderObject* linesObject = new RenderObject();
-  
+  RenderObject* triObject = new RenderObject();
+
   int size = 5;
   std::vector<Vector3> points(size);
   std::vector<Vector3> lines(size*2);
@@ -18,7 +19,9 @@ int main() {
   /*for (int i = 0; i < size; ++i) {
     points[i] = Vector3((int)(i * 1.8f) % 3, (int)(i*1.2f) % 4, (int)(i*1.6f) % 5);
   }*/
-  
+
+  // TRIANGLES
+  triObject->mesh = Mesh::GenerateTriangle();
  
   const int pointsSize = 500;
   float p[pointsSize*3];
@@ -30,15 +33,6 @@ int main() {
   }
 
   while(r.UpdateWindow()) {
-
-
-
-    // TRIANGLES
-
-    RenderObject* tri = new RenderObject();
-    tri->mesh = Mesh::GenerateTriangle();
-
-
 
     static float f = 0.0f;
     f += 0.001f;
@@ -85,9 +79,12 @@ int main() {
 	  r.ClearBuffers();
     r.DrawObject(pointsObject);
     r.DrawObject(linesObject);
-    r.DrawObject(tri);
+    r.DrawObject(triObject);
 	  r.SwapBuffers();
 	}
+
+  delete triObject->mesh;
+  delete triObject;
 
   delete linesObject->mesh;
   delete linesObject;

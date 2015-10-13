@@ -79,9 +79,9 @@ protected:
 
   void	ShadePixel(uint x, uint y, const Colour& c);
  
-	void	RasteriseTri(const Vector4 &v0, const Vector4 &v1, const Vector4 &v2, 
-		const Colour &c0 = Colour(), const Colour &c1 = Colour(), const Colour &c2= Colour(),
-		const Vector3 &t0 = Vector3(), const Vector3 &t1= Vector3(), const Vector3 &t2	= Vector3());
+	void	RasteriseTri(const Vector4 &triA, const Vector4 &triB, const Vector4 &triC, 
+		const Colour &colA = Colour(), const Colour &colB = Colour(), const Colour &colC= Colour(),
+		const Vector3 &texA = Vector3(), const Vector3 &texB= Vector3(), const Vector3 &texC	= Vector3());
 	
   BoundingBox CalculateBoxForTri(const Vector4& a, const Vector4& b, const Vector4& c);
 
