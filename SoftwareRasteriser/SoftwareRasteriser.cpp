@@ -114,6 +114,12 @@ void	SoftwareRasteriser::SwapBuffers() {
 	currentDrawBuffer = !currentDrawBuffer;
 }
 
+float SoftwareRasteriser::ScreenAreaOfTri(const Vector4& a, const Vector4& b, const Vector4& c) {
+  float area = ((a.x * b.y) + (b.x * c.y) + (c.x*a.y)) -
+    ((b.x*a.y) + (c.x*b.y) + (a.x*c.y));
+  return area*0.5f;
+}
+
 void	SoftwareRasteriser::DrawObject(RenderObject*o) {
   switch (o->GetMesh()->GetType()) {
   case PRIMITIVE_TRIANGLES:

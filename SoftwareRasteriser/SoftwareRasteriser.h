@@ -55,6 +55,8 @@ public:
 		viewProjMatrix		= projectionMatrix * viewMatrix;
 	}
 
+  static float ScreenAreaOfTri(const Vector4& a, const Vector4& b, const Vector4& c);
+
 protected:
 	Colour*	GetCurrentBuffer();
 
