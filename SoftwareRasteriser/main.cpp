@@ -20,8 +20,8 @@ int main() {
   }*/
   
  
-  int pointsSize = 50;
-  float p[150];
+  const int pointsSize = 500;
+  float p[pointsSize*3];
   srand(static_cast <unsigned> (time(0)));
   for (int i = 0; i < (pointsSize*3); ++i) {
     float f = ((float)rand() / (RAND_MAX));
@@ -30,6 +30,16 @@ int main() {
   }
 
   while(r.UpdateWindow()) {
+
+
+
+    // TRIANGLES
+
+    RenderObject* tri = new RenderObject();
+    tri->mesh = Mesh::GenerateTriangle();
+
+
+
     static float f = 0.0f;
     f += 0.001f;
 
@@ -39,7 +49,7 @@ int main() {
     float scale = 1.5f;
     for (int i = 0; i < pointsSize*3; i+=3) {
       p[i] += 0.001f;
-      points.push_back(Vector3(sin(p[i] * scale), p[i + 1] * scale, p[i + 2] * scale));
+      points.push_back(Vector3(cos(p[i] * scale), p[i + 1] * scale, p[i + 2] * scale));
     }
     /*points.push_back(Vector3(sin(f+4.9)/8, 0.1f, 1));
     points.push_back(Vector3(sin(f+6.4)/8, 0.5f, 1));
@@ -75,6 +85,7 @@ int main() {
 	  r.ClearBuffers();
     r.DrawObject(pointsObject);
     r.DrawObject(linesObject);
+    r.DrawObject(tri);
 	  r.SwapBuffers();
 	}
 

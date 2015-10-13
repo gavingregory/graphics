@@ -15,6 +15,17 @@ Mesh::~Mesh(void)	{
 	delete[] colours;
 	delete[] textureCoords;
 }
+Mesh*	Mesh::GenerateTriangle() {
+  Mesh* m = new Mesh();
+  m->type = PRIMITIVE_TRIANGLES;
+  m->numVertices = 3;
+  m->vertices = new Vector4[m->numVertices];
+  m->vertices[0] = Vector4(0.5f, -0.5f, 0, 1.0f);
+  m->vertices[1] = Vector4(0.0f, 0.5f, 0, 1.0f);
+  m->vertices[2] = Vector4(-0.5f, -0.5f, 0, 1.0f);
+
+  return m;
+}
 
 Mesh* Mesh::GenerateLines(const std::vector<Vector3> points) {
   Mesh* m = new Mesh();

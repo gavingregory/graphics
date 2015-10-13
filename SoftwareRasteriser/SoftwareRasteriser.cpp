@@ -116,6 +116,9 @@ void	SoftwareRasteriser::SwapBuffers() {
 
 void	SoftwareRasteriser::DrawObject(RenderObject*o) {
   switch (o->GetMesh()->GetType()) {
+  case PRIMITIVE_TRIANGLES:
+    RasteriseTriMesh(o);
+    break;
   case PRIMITIVE_POINTS:
     RasterisePointsMesh(o);
     break;
@@ -136,6 +139,32 @@ void SoftwareRasteriser::ShadePixel(uint x, uint y, const Colour& c) {
     return;
   int index = (y*screenWidth) + x;
   buffers[currentDrawBuffer][index] = c;
+}
+
+BoundingBox SoftwareRasteriser::CalculateBoxForTri(const Vector4& a, const Vector4& b, const Vector4& c) {
+  BoundingBox box;
+
+  box.topLeft.x = a.x; // Start with the first vertex value
+  box.topLeft.x = min(box.topLeft.x, b.x); // swap to second if less
+  box.topLeft.x = min(box.topLeft.x, c.x); // swap to third if less
+  box.topLeft.x = min(box.topLeft.x, 0.0f); // screen bound 
+
+  box.topLeft.y = a.y;
+  box.topLeft.y = min(box.topLeft.y, b.y);
+  box.topLeft.y = min(box.topLeft.y, c.y);
+  box.topLeft.y = min(box.topLeft.y, 0.0f);
+
+  box.bottomRight.x = a.x;
+  box.bottomRight.x = max(box.bottomRight.x, b.x);
+  box.bottomRight.x = max(box.bottomRight.x, c.x);
+  box.bottomRight.x = max(box.bottomRight.x, screenWidth);
+
+  box.bottomRight.y = a.y;
+  box.bottomRight.y = max(box.bottomRight.y, b.y);
+  box.bottomRight.y = max(box.bottomRight.y, c.y);
+  box.bottomRight.y = max(box.bottomRight.y, screenHeight);
+
+  return box;
 }
 
 void	SoftwareRasteriser::RasterisePointsMesh(RenderObject*o) {

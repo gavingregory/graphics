@@ -81,6 +81,8 @@ protected:
 		const Colour &c0 = Colour(), const Colour &c1 = Colour(), const Colour &c2= Colour(),
 		const Vector3 &t0 = Vector3(), const Vector3 &t1= Vector3(), const Vector3 &t2	= Vector3());
 	
+  BoundingBox CalculateBoxForTri(const Vector4& a, const Vector4& b, const Vector4& c);
+
 	int		currentDrawBuffer;
 
 	Colour*	buffers[2];
