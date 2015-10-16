@@ -167,8 +167,8 @@ void	SoftwareRasteriser::RasteriseTri(const Vector4 &triA, const Vector4 &triB, 
       screenPos.x = x; // create vertex 'p';
       screenPos.y = y; // create vertex 'p';
       
-      // todo: check this is correct???
       float triArea = ScreenAreaOfTri(v0, v1, v2);
+      float areaRecip = 1.0f / triArea;
 
       subTriArea[0] = abs(ScreenAreaOfTri(v0, screenPos, v1));
       subTriArea[1] = abs(ScreenAreaOfTri(v1, screenPos, v2));
@@ -183,7 +183,13 @@ void	SoftwareRasteriser::RasteriseTri(const Vector4 &triA, const Vector4 &triB, 
         continue; // tiny triangle we don't care about
       }
 
-      ShadePixel((int)x, (int)y, Colour::White);
+      float alpha = subTriArea[1] * areaRecip;
+      float beta  = subTriArea[2] * areaRecip;
+      float gamma = subTriArea[0] * areaRecip;
+
+      Colour subColour = ((colA*alpha) + (colB*beta) + (colC*gamma));
+      
+      ShadePixel((uint)x, (uint)y, subColour);
 
     }
   }
@@ -352,6 +358,10 @@ void	SoftwareRasteriser::RasteriseTriMesh(RenderObject*o) {
     v0.SelfDivisionByW();
     v1.SelfDivisionByW();
     v2.SelfDivisionByW();
-    RasteriseTri(v0, v1, v2);
+    RasteriseTri(v0, v1, v2,
+      o->GetMesh()->colours[i],
+      o->GetMesh()->colours[i+1],
+      o->GetMesh()->colours[i+2]
+    );
   }
 }

@@ -28,17 +28,24 @@ int main() {
     Vector3(-0.5f, -0.5f, 1.0f)
   );
 
+  RenderObject* triangle = new RenderObject();
+  triangle->mesh = Mesh::GenerateTriangle();
+
   while(r.UpdateWindow()) {
 
     // OTHER
 
 	  r.ClearBuffers();
+    r.DrawObject(triangle);
     r.DrawObject(linesObject);
 	  r.SwapBuffers();
 	}
 
   delete linesObject->mesh;
   delete linesObject;
+
+  delete triangle->mesh;
+  delete triangle;
 
 	return 0;
 }
