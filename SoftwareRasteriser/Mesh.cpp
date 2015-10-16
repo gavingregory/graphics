@@ -27,13 +27,17 @@ Mesh*	Mesh::GenerateTriangle() {
   return m;
 }
 
-Mesh* Mesh::GenerateLines(const std::vector<Vector3> points) {
+Mesh* Mesh::GenerateLine(const Vector3& from, const Vector3& to) {
   Mesh* m = new Mesh();
-  m->numVertices = points.size();
+  m->numVertices = 2;
   m->vertices = new Vector4[m->numVertices];
-  for (uint i = 0; i < m->numVertices; ++i) {
-    m->vertices[i] = Vector4(points[i].x, points[i].y, points[i].z, 1.0f);
-  }
+  m->colours = new Colour[m->numVertices];
+
+  m->vertices[0] = Vector4(from.x, from.y, from.z, 1.0f);
+  m->vertices[1] = Vector4(to.x, to.y, to.z, 1.0f);
+  m->colours[0] = Colour(255, 0, 0, 255);
+  m->colours[1] = Colour(0, 0, 255, 255);
+
   m->type = PRIMITIVE_LINES;
   return m;
 }

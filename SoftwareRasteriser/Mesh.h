@@ -42,7 +42,7 @@ public:
 	~Mesh(void);
 
 	static Mesh*	GenerateTriangle();
-	static Mesh*	GenerateLines(const std::vector<Vector3> points);
+	static Mesh*	GenerateLine(const Vector3& from, const Vector3& to);
   static Mesh*	GenerateLineLoop(const std::vector<Vector3> points);
   static Mesh*	GenerateLineStrip(const std::vector<Vector3> points);
   static Mesh*  GeneratePoints(const std::vector<Vector3> points);

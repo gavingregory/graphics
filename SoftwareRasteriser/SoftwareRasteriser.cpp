@@ -276,8 +276,14 @@ void SoftwareRasteriser::RasteriseLine(
   float absSlope = abs(slope);
   float error = 0.0f;
 
+  float reciprocalRange = 1.0f / range; // save a divide..
+
   for (int i = 0; i < range; ++i) {
-    ShadePixel(x, y, Colour::White);
+    float t = i*reciprocalRange;
+
+    Colour currentCol = colB*t + colA*(1.0f - t);
+
+    ShadePixel(x, y, currentCol);
     error += absSlope;
     if (error > 0.5f) {
       error -= 1.0f;
@@ -294,10 +300,13 @@ void	SoftwareRasteriser::RasteriseLinesMesh(RenderObject*o) {
     Vector4 v0 = mvp * o->GetMesh()->vertices[i];
     Vector4 v1 = mvp * o->GetMesh()->vertices[i + 1];
 
+    Colour c0 = o->GetMesh()->colours[i];
+    Colour c1 = o->GetMesh()->colours[i+1];
+
     v0.SelfDivisionByW();
     v1.SelfDivisionByW();
 
-    RasteriseLine(v0, v1);
+    RasteriseLine(v0, v1, c0, c1);
   }
 }
 
