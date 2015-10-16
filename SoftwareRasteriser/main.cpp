@@ -25,14 +25,39 @@ int main() {
   o3->modelMatrix = Matrix4::Translation(Vector3(0.5f, -0.5f, 0));
   o4->modelMatrix = Matrix4::Translation(Vector3(0.5f, 0.5f, 0));
 
+  Matrix4 viewMatrix;
+  float yaw = 0.0f;
+
   while(r.UpdateWindow()) {
 
-	  r.ClearBuffers();
+    yaw += Mouse::GetRelativePosition().x;
+
+    if (Keyboard::KeyDown(KEY_A)) {
+      viewMatrix = viewMatrix * Matrix4::Translation(Vector3(-0.001f, 0, 0));
+    }
+
+    if (Keyboard::KeyDown(KEY_D)) {
+      viewMatrix = viewMatrix * Matrix4::Translation(Vector3(0.001f, 0, 0));
+    }
+
+    if (Keyboard::KeyDown(KEY_W)) {
+      viewMatrix = viewMatrix * Matrix4::Translation(Vector3(0, 0.001f, 0));
+    }
+
+    if (Keyboard::KeyDown(KEY_S)) {
+      viewMatrix = viewMatrix * Matrix4::Translation(Vector3(0, -0.001f, 0));
+    }
+
+    viewMatrix = viewMatrix * Matrix4::Rotation(yaw, Vector3(0, 1, 0));
+
+    r.SetViewMatrix(viewMatrix);
+
+    r.ClearBuffers();
     r.DrawObject(o1);
     r.DrawObject(o2);
     r.DrawObject(o3);
     r.DrawObject(o4);
-	  r.SwapBuffers();
+    r.SwapBuffers();
 	}
 
   delete testTri;
