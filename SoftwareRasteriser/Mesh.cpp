@@ -52,7 +52,6 @@ Mesh* Mesh::GenerateLineLoop(const std::vector<Vector3> points) {
 Mesh* Mesh::GenerateLineStrip(const std::vector<Vector3> points) {
   Mesh* m = new Mesh();
   m->numVertices = points.size();
-  std::cout << "size " << points.size() << std::endl;
   m->vertices = new Vector4[m->numVertices];
   for (uint i = 0; i < m->numVertices; ++i) {
     m->vertices[i] = Vector4(points[i].x, points[i].y, points[i].z, 1.0f);
