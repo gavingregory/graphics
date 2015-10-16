@@ -8,44 +8,38 @@
 
 int main() {
 	SoftwareRasteriser r(800,600);
-  RenderObject* linesObject = new RenderObject();
+  Mesh* testTri = Mesh::GenerateTriangle();
 
-  int size = 4;
-  std::vector<Vector3> lines(size);
-  std::vector<Colour> colours(size);
+  RenderObject* o1 = new RenderObject();
+  RenderObject* o2 = new RenderObject();
+  RenderObject* o3 = new RenderObject();
+  RenderObject* o4 = new RenderObject();
 
-  lines.push_back(Vector3(0.5f, 0.5f, 1.0f));
-  lines.push_back(Vector3(-0.5f, -0.5f, 1.0f));
-  lines.push_back(Vector3(-0.5f, 0.5f, 1.0f));
-  lines.push_back(Vector3(0.5f, -0.5f, 1.0f));
-  colours.push_back(Colour(255, 0, 0, 255));
-  colours.push_back(Colour(0, 255, 0, 255));
-  colours.push_back(Colour(0, 255, 0, 255));
-  colours.push_back(Colour(0, 0, 255, 255));
-  
-  linesObject->mesh = Mesh::GenerateLine(
-    Vector3(0.5f, 0.5f, 1.0f),
-    Vector3(-0.5f, -0.5f, 1.0f)
-  );
+  o1->mesh = testTri;
+  o2->mesh = testTri;
+  o3->mesh = testTri;
+  o4->mesh = testTri;
 
-  RenderObject* triangle = new RenderObject();
-  triangle->mesh = Mesh::GenerateTriangle();
+  o1->modelMatrix = Matrix4::Translation(Vector3(-0.5f, -0.5f, 0));
+  o2->modelMatrix = Matrix4::Translation(Vector3(-0.5f, 0.5f, 0));
+  o3->modelMatrix = Matrix4::Translation(Vector3(0.5f, -0.5f, 0));
+  o4->modelMatrix = Matrix4::Translation(Vector3(0.5f, 0.5f, 0));
 
   while(r.UpdateWindow()) {
 
-    // OTHER
-
 	  r.ClearBuffers();
-    r.DrawObject(triangle);
-    r.DrawObject(linesObject);
+    r.DrawObject(o1);
+    r.DrawObject(o2);
+    r.DrawObject(o3);
+    r.DrawObject(o4);
 	  r.SwapBuffers();
 	}
 
-  delete linesObject->mesh;
-  delete linesObject;
-
-  delete triangle->mesh;
-  delete triangle;
+  delete testTri;
+  delete o1;
+  delete o2;
+  delete o3;
+  delete o4;
 
 	return 0;
 }
